@@ -2,6 +2,7 @@
 {
     public record OrderCreateDto
     {
+       
         public decimal TotalAmount { get; set; }
     }
 }
