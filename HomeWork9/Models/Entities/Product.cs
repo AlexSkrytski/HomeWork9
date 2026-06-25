@@ -1,0 +1,8 @@
+﻿namespace HomeWork9.Models.Entities
+{
+    public class Product : BaseEntity
+    {
+        public string Name { get; set; }
+        public decimal Price { get; set; }
+    }
+}
