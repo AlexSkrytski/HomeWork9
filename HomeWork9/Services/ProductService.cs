@@ -1,4 +1,5 @@
-﻿using HomeWork9.Models.Entities;
+﻿using HomeWork9.Models.DTOs;
+using HomeWork9.Models.Entities;
 using HomeWork9.Repositories;
 
 namespace HomeWork9.Services
@@ -12,54 +13,40 @@ namespace HomeWork9.Services
             _productRepository = productRepository;
         }
 
-        // Симуляция пинга для добавления
-        public void HandleAddProductPing(Product product)
+        public ProductReadDto HandleAddProductPing(ProductCreateDto dto)
         {
             try
             {
-                _productRepository.Add(product);
-                Console.WriteLine("Продукт успешно добавлен.");
+                if (dto == null) throw new ArgumentNullException(nameof(dto));
+
+                // Маппинг: DTO -> Entity
+                var productEntity = new Product
+                {
+                    Name = dto.Name,
+                    Price = dto.Price
+                };
+
+                var savedProduct = _productRepository.Add(productEntity);
+
+                // Маппинг: Entity -> DTO
+                return new ProductReadDto
+                {
+                    Id = savedProduct.Id,
+                    Name = savedProduct.Name,
+                    Price = savedProduct.Price
+                };
             }
-            catch (ArgumentNullException ex)
-            {
-                Console.WriteLine($"Ошибка валидации: {ex.Message}");
-                throw;
-            }
-            catch (InvalidOperationException ex)
-            {
-                Console.WriteLine($"Конфликт данных: {ex.Message}");
-                throw;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Непредвиденная ошибка: {ex.Message}");
-                throw;
-            }
+            catch (Exception) { throw; }
         }
 
-        // Симуляция пинга для обновления
-        public void HandleUpdateProductPing(Product product)
+        public IEnumerable<ProductReadDto> HandleGetAllProductsPing()
         {
-            try
+            return _productRepository.GetAll().Select(p => new ProductReadDto
             {
-                _productRepository.Update(product);
-                Console.WriteLine("Продукт успешно обновлен.");
-            }
-            catch (KeyNotFoundException ex)
-            {
-                Console.WriteLine($"Ошибка обновления: {ex.Message}");
-                throw;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Непредвиденная ошибка: {ex.Message}");
-                throw;
-            }
-        }
-
-        public IEnumerable<Product> HandleGetAllProductsPing()
-        {
-            return _productRepository.GetAll();
+                Id = p.Id,
+                Name = p.Name,
+                Price = p.Price
+            });
         }
     }
 }
