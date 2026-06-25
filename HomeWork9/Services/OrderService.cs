@@ -94,5 +94,16 @@ namespace HomeWork9.Services
                 throw;
             }
         }
+
+        public OrderReadDto HandleUpdateOrderPing(Order order)
+        {
+            var updated = _orderRepository.Update(order);
+            return new OrderReadDto { Id = updated.Id, OrderDate = updated.OrderDate, TotalAmount = updated.TotalAmount };
+        }
+
+        public void HandleDeleteOrderPing(int id)
+        {
+            _orderRepository.Delete(id);
+        }
     }
 }

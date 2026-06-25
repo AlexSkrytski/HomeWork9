@@ -48,5 +48,16 @@ namespace HomeWork9.Services
                 Price = p.Price
             });
         }
+
+        public ProductReadDto HandleUpdateProductPing(Product product)
+        {
+            var updated = _productRepository.Update(product);
+            return new ProductReadDto { Id = updated.Id, Name = updated.Name, Price = updated.Price };
+        }
+
+        public void HandleDeleteProductPing(int id)
+        {
+            _productRepository.Delete(id);
+        }
     }
 }

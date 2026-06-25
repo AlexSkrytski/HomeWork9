@@ -1,4 +1,5 @@
 ﻿using HomeWork9.Models.DTOs;
+using HomeWork9.Models.Entities;
 using HomeWork9.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -73,6 +74,54 @@ namespace HomeWork9.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { error = $"Ошибка при архивации: {ex.Message}" }); // HTTP 500
+            }
+        }
+
+        [HttpPut("{id}")] // URL: api/order/5
+        public IActionResult Update(int id, [FromBody] OrderCreateDto dto)
+        {
+            try
+            {
+                var orderToUpdate = new Order
+                {
+                    Id = id,
+                    OrderDate = DateTime.UtcNow, // Или подтягивать старую дату из БД/списка в сервисе
+                    TotalAmount = dto.TotalAmount
+                };
+
+                var result = _orderService.HandleUpdateOrderPing(orderToUpdate);
+                return Ok(result); // HTTP 200
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message }); // HTTP 404
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { error = ex.Message }); // HTTP 400
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = $"Ошибка при обновлении заказа: {ex.Message}" });
+            }
+        }
+
+        // 5. Удалить заказ (PING на DELETE)
+        [HttpDelete("{id}")] // URL: api/order/5
+        public IActionResult Delete(int id)
+        {
+            try
+            {
+                _orderService.HandleDeleteOrderPing(id);
+                return NoContent(); // HTTP 204 No Content
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message }); // HTTP 404
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = $"Ошибка при удалении заказа: {ex.Message}" });
             }
         }
     }
